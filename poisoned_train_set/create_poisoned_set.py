@@ -48,7 +48,7 @@ def add_arguments(parser):
                         default=default_args.parser_default['alpha'])
     parser.add_argument('-trigger', type=str,  required=False,
                         default=None)
-    parser.add_argument('-poison_seed', type=int, default=0)
+    parser.add_argument('-poison_seed', type=int, default=attack_config.poison_seed)
     return parser
 
 def prepare_dataset(args):

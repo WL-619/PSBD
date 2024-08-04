@@ -27,7 +27,7 @@ def add_arguments(parser):
     parser.add_argument('-poisoning_ratio', type=float)
     parser.add_argument('-adv_data_path', type=str)
     parser.add_argument('-alpha', type=float, default=0.05)
-    parser.add_argument('-poison_seed', type=int, default=0)
+    parser.add_argument('-poison_seed', type=int, default=attack_config.poison_seed)
     return parser
 
 def prepare_dataset(args):
@@ -133,4 +133,5 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser = add_arguments(parser)
     args = parser.parse_args()
+    tools.setup_seed(args.poison_seed)
     prepare_dataset(args)
