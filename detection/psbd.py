@@ -305,7 +305,7 @@ def compute_psu(args, model, dataloader, mode, forward_passes=3, drop_p=0.8, ret
     else:
         return psu
 
-def get_psu(model, clean_loader, bd_loader, val_loader, forward_passes=3, drop_p=0.8):    
+def get_psu(args, model, clean_loader, bd_loader, val_loader, forward_passes=3, drop_p=0.8):    
     # compute psu of clean training data, backdoor training data, and clean extra validation data
     clean_psu = torch.empty(0).cuda()
     backdoor_psu = torch.empty(0).cuda()
@@ -581,13 +581,14 @@ if __name__ == "__main__":
     print("FPR: {:.3f}".format(fpr))
 
     # clean_psu, backdoor_psu, val_psu = get_psu(
-    #         selcected_model, 
-    #         clean_loader,
-    #         backdoor_loader,
-    #         extra_val_set_loader,
-    #         forward_passes=3, 
-    #         drop_p=selected_p
-    #     )
+        #     args,
+        #     selcected_model, 
+        #     clean_loader,
+        #     backdoor_loader,
+        #     extra_val_set_loader,
+        #     forward_passes=3, 
+        #     drop_p=selected_p
+        # )
     # clean_psu = clean_psu.squeeze(1)
     # backdoor_psu = backdoor_psu.squeeze(1)
     # val_psu = val_psu.squeeze(1)
