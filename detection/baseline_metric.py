@@ -166,7 +166,7 @@ def get_checkpoint_path(args):
         if args.load_bench_data:
             checkpoint_path = os.path.join(args.checkpoint_save_path, "data_from_bench")
         else:
-            checkpoint_path = default_args.checkpoint_save_path
+            checkpoint_path = args.checkpoint_save_path
             
         checkpoint_path = os.path.join(checkpoint_path, arch.__name__, args.dataset)
 
