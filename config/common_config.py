@@ -14,6 +14,7 @@ from models import resnet, vgg
 arch = {
     ### base model of training
     'cifar10': resnet.ResNet18,
+    'gtsrb': resnet.ResNet18,
     'tiny': resnet.ResNet18,
     # 'cifar10': vgg.vgg16_bn,
     # 'tiny': vgg.vgg16_bn,

@@ -11,6 +11,7 @@ from torchvision import datasets
 import argparse
 import random
 from config import common_config, default_args
+from dataset.GTSRB import GTSRB
 from utils import tools, supervisor
 
 def add_arguments(parser):
@@ -39,6 +40,15 @@ def prepare_dataset(args):
             train=False,
             download=True,
             transform=data_transform,
+        )
+    elif args.dataset == 'gtsrb':
+            clean_set = GTSRB(
+            root=os.path.join(data_dir, 'gtsrb'),
+            train=False,
+            transform=transforms.Compose([
+                transforms.Resize((32, 32)),
+                transforms.ToTensor(),
+            ]), 
         )
     elif args.dataset == 'tiny':
         clean_set = datasets.ImageFolder(

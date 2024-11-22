@@ -218,7 +218,7 @@ if __name__ == "__main__":
 
     poisoned_train_set, extra_val_set, backdoor_indicator = prepare_dataset(args)
 
-    from detection import scan, strip, spectral_signature, spectre_python, scp
+    from detection import scan, strip, spectral_signature, spectre_python, scp, cdl
 
     if args.baseline == 'scan':
         suspicious_indices = scan.cleanser(poisoned_train_set, selcected_model, num_classes, extra_val_set)
@@ -230,12 +230,17 @@ if __name__ == "__main__":
         suspicious_indices = spectral_signature.cleanser(poisoned_train_set, selcected_model, num_classes, args)
     elif args.baseline == 'scp':
         suspicious_indices = scp.cleanser(poisoned_train_set, selcected_model, args, extra_val_set)
+    elif args.baseline == 'cdl':
+        suspicious_indices = cdl.cleanser(poisoned_train_set, selcected_model, args, extra_val_set)
     else:
         raise NotImplementedError('Baseline is not implemented')
 
     # we treat backdoor data as positive samples.
-    backdoor_prediction = torch.zeros(len(poisoned_train_set))
-    backdoor_prediction[suspicious_indices] = 1
+    if args.baseline != 'cdl':
+        backdoor_prediction = torch.zeros(len(poisoned_train_set))
+        backdoor_prediction[suspicious_indices] = 1
+    else:
+        backdoor_prediction = suspicious_indices
 
     tn, fp, fn, tp = metrics.confusion_matrix(backdoor_indicator, backdoor_prediction).ravel()
     tpr = tp / (tp + fn)

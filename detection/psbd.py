@@ -42,8 +42,6 @@ def add_arguments(parser):
 
             log (bool, default=False): Whether to save log file
 
-            baseline (str): Selection of baseline
-
             random_seed (int): Random seed for model training and dropout, rather than the seed used for generating the poisoned dataset
 
             result_path (str): Path to save result files

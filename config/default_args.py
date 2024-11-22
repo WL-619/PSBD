@@ -3,7 +3,7 @@ config of data path and model training
 """
 
 parser_choices = {
-    'dataset': ['cifar10', 'tiny'],
+    'dataset': ['cifar10', 'gtsrb', 'tiny'],
     'poison_type':   # poisoning attacks
         ['badnet', 'blend', 'trojannn', 'lc', 'wanet', 'issba', 'adaptive_blend'],
     

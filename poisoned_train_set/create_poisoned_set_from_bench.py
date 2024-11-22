@@ -6,6 +6,7 @@ from torchvision import datasets, transforms
 import numpy as np
 from config import common_config
 from utils import supervisor, tools
+from dataset.GTSRB import GTSRB
 import argparse
 
 def add_arguments(parser):
@@ -41,6 +42,11 @@ def prepare_dataset(args):
     if args.dataset == 'cifar10':
         clean_train_data = datasets.CIFAR10(
             root=clean_data_dir, 
+            train=True
+        )
+    elif args.dataset == 'gtsrb':
+        clean_train_data = GTSRB(
+            clean_data_dir,
             train=True
         )
     elif args.dataset == 'tiny':

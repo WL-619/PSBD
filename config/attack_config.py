@@ -8,6 +8,7 @@ record_poison_seed = False  # set to False if the data is from https://github.co
 
 target_label = {    # default target class is 0 (without loss of generality)
     'cifar10' : 0,
+    'gtsrb' : 0,
     'tiny': 0,
 }
 
@@ -23,6 +24,16 @@ trigger_default = {     # trigger of attacks
         'issba': 'none',
         'adaptive_blend': 'hellokitty_32.png',
     },
+    'gtsrb': {
+        'badnet' : 'badnet_patch_32.png',
+        'blend' : 'hellokitty_32.png',
+        'trojannn': 'none',
+        'lc' : 'badnet_patch4_32.png',
+        'wanet': 'none',
+        'issba': 'none',
+        'adaptive_blend': 'hellokitty_32.png',
+    },
+
     'tiny': {
         'badnet': 'badnet_patch_64.png',
         'blend' : 'hellokitty_64.png',

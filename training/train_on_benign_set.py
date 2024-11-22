@@ -7,6 +7,7 @@ from config import attack_config, common_config, default_args
 from utils import tools, supervisor
 import json
 from torchvision import datasets
+from dataset.GTSRB import GTSRB
 from torch import nn
 import torch
 import datetime
@@ -60,7 +61,12 @@ def prepare_dataset(args):
             download=True, 
             transform=data_transform if args.no_aug else data_transform_aug
         )
-
+    elif args.dataset == 'gtsrb':
+        train_set = GTSRB(
+            os.path.join(clean_data_dir, 'gtsrb'),
+            train=True,
+            transform=data_transform if args.no_aug else data_transform_aug
+        )
     elif args.dataset == 'tiny':
         train_set = datasets.ImageFolder(
             os.path.join(os.path.join(clean_data_dir, 'tiny'), 'train'),
@@ -69,12 +75,18 @@ def prepare_dataset(args):
     else:
         raise NotImplementedError('Dataset is not implemented')
 
-    test_dir = os.path.join(clean_data_dir, args.dataset)
+    test_dir = supervisor.get_clean_test_dir(args)
     if args.dataset == 'cifar10':
         test_set = datasets.CIFAR10(
             root=test_dir, 
             transform=data_transform, 
             train=False
+        )
+    elif args.dataset == 'gtsrb':
+        test_set = GTSRB(
+            root=test_dir,
+            train=False,
+            transform=data_transform if args.no_aug else data_transform_aug
         )
     elif args.dataset == 'tiny':
         test_dir = os.path.join(test_dir, 'val')

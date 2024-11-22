@@ -7,6 +7,7 @@ from config import attack_config, common_config, default_args
 from utils import tools, supervisor
 import json
 from torchvision import datasets, transforms
+from dataset.GTSRB import GTSRB
 from torch import nn
 import torch
 import datetime
@@ -92,6 +93,12 @@ def prepare_dataset(args):
             root=clean_test_dir, 
             transform=data_transform, 
             train=False
+        )
+    elif args.dataset == 'gtsrb':
+        clean_test_set = GTSRB(
+            root=clean_test_dir, 
+            train=False,
+            transform=data_transform, 
         )
     elif args.dataset == 'tiny':
         clean_test_set = datasets.ImageFolder(

@@ -107,6 +107,48 @@ def get_transforms(args):
                                      [1 / 0.247, 1 / 0.243, 1 / 0.261])
             ])
 
+    elif args.dataset == 'gtsrb':
+        if args.no_normalize:
+            data_transform_aug = transforms.Compose([
+                transforms.Resize((32, 32)),
+                transforms.RandomHorizontalFlip(),
+                transforms.RandomCrop(32, 4),
+                transforms.ToTensor()
+            ])
+            data_transform = transforms.Compose([
+                transforms.Resize((32, 32)),
+                transforms.ToTensor()
+            ])
+            trigger_transform = transforms.Compose([
+                transforms.ToTensor(),
+            ])
+            normalizer = transforms.Compose([])
+            denormalizer = transforms.Compose([])
+        else:
+            data_transform_aug = transforms.Compose([
+                transforms.Resize((32, 32)),
+                transforms.RandomHorizontalFlip(),
+                transforms.RandomCrop(32, 4),
+                transforms.ToTensor(),
+                transforms.Normalize([0.3337, 0.3064, 0.3171], [0.2672, 0.2564, 0.2629])
+            ])
+            data_transform = transforms.Compose([
+                transforms.Resize((32, 32)),
+                transforms.ToTensor(),
+                transforms.Normalize([0.3337, 0.3064, 0.3171], [0.2672, 0.2564, 0.2629])
+            ])
+            trigger_transform = transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize([0.3337, 0.3064, 0.3171], [0.2672, 0.2564, 0.2629])
+            ])
+            normalizer = transforms.Compose([
+                transforms.Normalize([0.3337, 0.3064, 0.3171], [0.2672, 0.2564, 0.2629])
+            ])
+            denormalizer = transforms.Compose([
+                transforms.Normalize([-0.3337 / 0.2672, -0.3064 / 0.2564, -0.3171 / 0.2629],
+                                     [1 / 0.2672, 1 / 0.2564, 1 / 0.2629])
+            ])
+
     elif args.dataset == 'tiny':
         if args.no_normalize:
             data_transform_aug = transforms.Compose([
@@ -155,7 +197,7 @@ def get_poison_transform(poison_type, dataset_name, target_label, trigger_transf
     if trigger_name is None:
         trigger_name = attack_config.trigger_default[dataset_name][poison_type]
 
-    if dataset_name in ['cifar10']:
+    if dataset_name in ['cifar10', 'gtsrb']:
         img_size = 32
     elif dataset_name == 'tiny':
         img_size = 64
@@ -170,6 +212,15 @@ def get_poison_transform(poison_type, dataset_name, target_label, trigger_transf
             transforms.Normalize([-0.4914 / 0.247, -0.4822 / 0.243, -0.4465 / 0.261],
                                  [1 / 0.247, 1 / 0.243, 1 / 0.261])
         ])
+    elif dataset_name == 'gtsrb':
+        normalizer = transforms.Compose([
+                transforms.Normalize([0.3337, 0.3064, 0.3171], [0.2672, 0.2564, 0.2629])
+            ])
+        denormalizer = transforms.Compose([
+            transforms.Normalize([-0.3337 / 0.2672, -0.3064 / 0.2564, -0.3171 / 0.2629],
+                                    [1 / 0.2672, 1 / 0.2564, 1 / 0.2629])
+        ])
+
     elif dataset_name == 'tiny':
         normalizer = transforms.Compose([
             transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
@@ -287,6 +338,11 @@ def get_info_dataset(args, get_count=False):
         num_classes = 10
         num_train_imgs = 50000
         num_test_imgs = 10000
+    elif args.dataset == 'gtsrb':
+        img_size = 32
+        num_classes = 43
+        num_train_imgs = 39209
+        num_test_imgs = 12630
     elif args.dataset == 'tiny':
         img_size = 64
         num_classes = 200

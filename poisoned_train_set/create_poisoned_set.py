@@ -6,6 +6,7 @@ import sys
 sys.path.append("..")
 import torch
 from torchvision import datasets, transforms
+from dataset.GTSRB import GTSRB
 import argparse
 from PIL import Image
 import numpy as np
@@ -74,7 +75,16 @@ def prepare_dataset(args):
             download=True, 
             transform=data_transform
         )
-
+    elif args.dataset == 'gtsrb':
+        data_transform = transforms.Compose([
+            transforms.Resize((32, 32)),
+            transforms.ToTensor(),
+        ])
+        train_set = GTSRB(
+            os.path.join(clean_data_dir, 'gtsrb'),
+            train=True,
+            transform=data_transform
+        )
     elif args.dataset == 'tiny':
         data_transform = transforms.Compose([
             transforms.ToTensor(),
