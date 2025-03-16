@@ -244,12 +244,12 @@ def cleanser(inspection_set, model, num_classes, clean_set):
 
     kwargs = {'num_workers': 4, 'pin_memory': True}
 
-    # main dataset we aim to cleanse
+    # The dataset we aim to cleanse
     inspection_split_loader = torch.utils.data.DataLoader(
         inspection_set,
         batch_size=128, shuffle=False, **kwargs)
 
-    # a small clean batch for defensive purpose
+    # A small clean batch for defensive purpose
     clean_set_loader = torch.utils.data.DataLoader(
         clean_set,
         batch_size=128, shuffle=True, **kwargs)
@@ -265,7 +265,7 @@ def cleanser(inspection_set, model, num_classes, clean_set):
 
     scan = SCAn()
 
-    # fit the clean distribution with the small clean split at hand
+    # Fit the clean distribution with the small clean split at hand
     gb_model = scan.build_global_model(feats_clean, class_indices_clean, num_classes)
 
     size_inspection_set = len(feats_inspection)
@@ -273,10 +273,10 @@ def cleanser(inspection_set, model, num_classes, clean_set):
     feats_all = np.concatenate([feats_inspection, feats_clean])
     class_indices_all = np.concatenate([class_indices_inspection, class_indices_clean])
 
-    # use the global model to divide samples
+    # Use the global model to divide samples
     lc_model = scan.build_local_model(feats_all, class_indices_all, gb_model, num_classes)
 
-    # statistic test for the existence of "two clusters"
+    # Statistic test for the existence of "two clusters"
     score = scan.calc_final_score(lc_model)
     threshold = np.e
 
@@ -311,8 +311,8 @@ def cleanser(inspection_set, model, num_classes, clean_set):
                     cluster_0_indices.append(tar[index])
 
 
-        # decide which cluster is the poison cluster, according to clean samples' distribution
-        if len(cluster_0_clean) < len(cluster_1_clean): # if most clean samples are in cluster 1
+        # Decide which cluster is the poison cluster, according to clean samples' distribution
+        if len(cluster_0_clean) < len(cluster_1_clean): # If most clean samples are in cluster 1
             suspicious_indices += cluster_0_indices
         else:
             suspicious_indices += cluster_1_indices

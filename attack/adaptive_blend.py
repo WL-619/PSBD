@@ -19,9 +19,9 @@ def get_trigger_mask(img_size, total_pieces, masked_pieces):
     candidate_idx = random.sample(list(range(total_pieces)), k=masked_pieces)
     mask = torch.ones((img_size, img_size))
     for i in candidate_idx:
-        x = int(i % div_num)  # column
-        y = int(i // div_num)  # row
-        mask[x * step: (x + 1) * step, y * step: (y + 1) * step] = 0
+        x = int(i % div_num)  # Column index
+        y = int(i // div_num)  # Row index
+        mask[x*step : (x+1)*step, y*step : (y+1)*step] = 0
     return mask
 
 
@@ -29,11 +29,25 @@ class poison_generator():
 
     def __init__(self, img_size, dataset, poisoning_ratio, trigger, target_label, alpha=0.2, cover_rate=0.01,
                  pieces=16, mask_rate=0.5):
+        """
+        Initializes the generator for poisoned samples in the adaptive blend backdoor attack
+        
+        Args:
+            img_size: Input image size (assumed square)
+            dataset: The training dataset
+            poisoning_ratio: The ratio of poisoned samples
+            trigger: The backdoor trigger pattern tensor
+            target_label: Target class label
+            alpha: Blending strength
+            cover_rate: The ratio of cover samples that contain the trigger but retain their original labels
+            pieces: The number of grid divisions for the image
+            mask_rate: The ratio of masked grid cells
+        """
 
         self.img_size = img_size
         self.dataset = dataset
         self.poisoning_ratio = poisoning_ratio
-        self.target_label = target_label  # by default : target_class = 0
+        self.target_label = target_label  # By default : target_class = 0
         self.trigger = trigger
         self.alpha = alpha
         self.cover_rate = cover_rate
@@ -43,23 +57,23 @@ class poison_generator():
         self.mask_rate = mask_rate
         self.masked_pieces = round(self.mask_rate * self.pieces)
 
-        # number of images
+        # The number of images
         self.num_img = len(dataset)
 
     def generate_poisoned_training_set(self):
 
-        # random sampling
+        # Random sampling
         id_set = list(range(0, self.num_img))
         random.shuffle(id_set)
         num_poison = int(self.num_img * self.poisoning_ratio)
         backdoor_indices = id_set[:num_poison]
 
         num_cover = int(self.num_img * self.cover_rate)
-        cover_indices = id_set[num_poison:num_poison + num_cover]  # use **non-overlapping** images to cover
+        cover_indices = id_set[num_poison:num_poison + num_cover]  # Use **non-overlapping** images to cover
         
         clean_indices = id_set[num_poison + num_cover:]
 
-        backdoor_indices.sort()  # increasing order
+        backdoor_indices.sort()  # Increasing order
         cover_indices.sort()
         clean_indices.sort()
         print('backdoor samples num: ', len(backdoor_indices))

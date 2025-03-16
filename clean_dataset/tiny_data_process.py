@@ -7,7 +7,7 @@
 # Code ported from https://github.com/AI-secure/DBA/blob/master/utils/tinyimagenet_reformat.py
 
 
-# this file is to preprocess imagenet so that the label of validation set would make sense
+# This file is to preprocess imagenet so that the label of validation set would make sense
 
 import io
 import glob

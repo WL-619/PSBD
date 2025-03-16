@@ -13,39 +13,39 @@ from torchvision import transforms
 def add_arguments(parser):
     """
         Args:
-            dataset (str): The dataset we used
+            dataset (str): The training dataset
             
-            poison_type (str): Attack types
+            poison_type (str): Attack type
 
             poisoning_ratio (float): Proportion of backdoor data in the entire training dataset
             
             cover_rate (float): Ratio of data samples with backdoor trigger but without label modification to target class
 
-            alpha (float): Blend rate for blend or adaptive_blend attacks
+            alpha (float): Blend strength for blend or adaptive_blend attack
 
-            test_alpha (float): Blend rate for blend or adaptive_blend attacks during test stage
+            test_alpha (float): Blend strength for blend or adaptive_blend attack during test stage
 
-            trigger (str): trigger of attacks
+            trigger (str): Trigger of attacks
 
-            no_aug (bool, default=False): Whether to use data augmentation. If True, data augmentation will be applied
+            no_aug (bool, default=False): Whether to use data augmentation
 
-            no_normalize (bool, default=False): Whether to use data normalization. If True, data normalization will be applied
+            no_normalize (bool, default=False): Whether to use data normalization
 
             load_bench_data (bool, default=False): Whether to use data provided by https://github.com/SCLBD/BackdoorBench
 
-            baseline (str): Selection of baseline: ss(spectral signature), strip, spectre, scan, scp    
+            baseline (str): Baseline backdoor data detection method, e.g., spectral signature, strip, spectre, scan, scp, or cdl.
 
             random_seed (int): Random seed for model training, rather than the seed used for generating the poisoned dataset
 
             result_path (str): Path to save result files
 
-            checkpoint_save_path (str): Path to save checkpoints for loading checkpoints
+            checkpoint_save_path (str): Path to save model checkpoints
 
-            val_budget_rate (float, default=0.05): Proportion of clean extra validation data compared to the entire poisoned training set
+            val_budget_rate (float, default=0.05): Size of clean extra validation dataset compared to the entire poisoned training set
 
             select_model (int, default=95): Model used for backdoor data detection
 
-            load_checkpoint_path (str): Directly specify the path of checkpoints
+            load_checkpoint_path (str): Specify the path of checkpoints directly if needed
 
     """
 
@@ -154,8 +154,8 @@ def prepare_dataset(args):
     else:
         poisoned_train_set = torch.utils.data.ConcatDataset([clean_train_set, cover_train_set, backdoor_train_set])
 
-    # we do not consider cover data as backdoor data because cover data cannot trigger the backdoor attack
-    # we treat backdoor data as positive samples
+    # We do not consider cover data as backdoor data because cover data cannot trigger the backdoor attack
+    # We treat backdoor data as positive samples
     backdoor_indicator = torch.zeros(len(poisoned_train_set))
     backdoor_indicator[-len(backdoor_train_set):] = 1
 
@@ -235,7 +235,7 @@ if __name__ == "__main__":
     else:
         raise NotImplementedError('Baseline is not implemented')
 
-    # we treat backdoor data as positive samples.
+    # We treat backdoor data as positive samples
     if args.baseline != 'cdl':
         backdoor_prediction = torch.zeros(len(poisoned_train_set))
         backdoor_prediction[suspicious_indices] = 1

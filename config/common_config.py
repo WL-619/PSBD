@@ -1,18 +1,18 @@
 """
-config of data path and model training
+Configuration file for data path and model training settings
 """
 
 import sys
 sys.path.append("../")
 
-clean_data_dir = '../clean_dataset' # defaul clean dataset directory
-extra_data_dir = "../extra_val_set" # clean extra clean validation dataset directory
+clean_data_dir = '../clean_dataset' # Defaul clean dataset directory
+extra_data_dir = "../extra_val_set" # Clean extra validation dataset directory
 
-# arch setting
+# Model architecture settings
 from models import resnet, vgg
 
 arch = {
-    ### base model of training
+    # Base model architecture of training
     'cifar10': resnet.ResNet18,
     'gtsrb': resnet.ResNet18,
     'tiny': resnet.ResNet18,

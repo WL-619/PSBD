@@ -1,12 +1,16 @@
 """
-config of attacks
+Configuration file for backdoor attack settings
 """
 
-poison_seed = 0             # random seed for creating suspicous training set
-record_poison_seed = False  # set to False if the data is from https://github.com/SCLBD/BackdoorBench
+# Random seed used for creating a suspicious training dataset
+poison_seed = 0
 
+# Indicates whether to record the poison seed
+# If the dataset is sourced from https://github.com/SCLBD/BackdoorBench, set this to False
+record_poison_seed = False
 
-target_label = {    # default target class is 0 (without loss of generality)
+# By default, the target class label is set to 0 for all datasets
+target_label = {
     'cifar10' : 0,
     'gtsrb' : 0,
     'tiny': 0,
@@ -14,7 +18,7 @@ target_label = {    # default target class is 0 (without loss of generality)
 
 triggers_dir = '../triggers'
 
-trigger_default = {     # trigger of attacks
+trigger_default = {     # Trigger of attacks
     'cifar10': {
         'badnet' : 'badnet_patch_32.png',
         'blend' : 'hellokitty_32.png',

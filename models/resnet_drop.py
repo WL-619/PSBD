@@ -1,5 +1,5 @@
 '''
-Modified from https://github.com/vtu81/backdoor-toolbox/blob/main/utils/resnet.py
+Code modified from https://github.com/vtu81/backdoor-toolbox/blob/main/utils/resnet.py
 '''
 import torch
 import torch.nn as nn
@@ -32,7 +32,7 @@ class BasicBlock(nn.Module):
         out = self.bn2(self.conv2(out))
         out += self.shortcut(x)
         
-        # we place the dropout after the residual connection each block to maximize its impact on feature extraction
+        # We place the dropout after the residual connection each block to maximize its impact on feature extraction
         out = self.drop_out(out)
         out = F.relu(out)
         return out

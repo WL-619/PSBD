@@ -7,27 +7,40 @@ import random
 
 class poison_generator():
 
-    def __init__(self, img_size, dataset, poisoning_ratio, trigger_mark, trigger_mask, target_label, alpha=1.0):
+    def __init__(self, img_size, dataset, poisoning_ratio, trigger, mask, target_label, alpha=1.0):
+        """
+        Initializes the generator for poisoned samples in the badnet backdoor attack
+        
+        Args:
+            img_size: Input image size (assumed square)
+            dataset: The training dataset
+            poisoning_ratio: The ratio of poisoned samples
+            trigger: The backdoor trigger pattern tensor
+            mask: The trigger mask tensor
+            target_label: Target class label
+            alpha: Blending strength
+        """
+                
         self.img_size = img_size
         self.dataset = dataset
         self.poisoning_ratio = poisoning_ratio
         self.target_label = target_label
-        self.trigger_mark = trigger_mark
-        self.trigger_mask = trigger_mask
+        self.trigger = trigger
+        self.mask = mask
         self.alpha = alpha
 
-        # number of images
+        # The number of images
         self.num_img = len(dataset)
 
     def generate_poisoned_training_set(self):
-        # random sampling
+        # Random sampling
         id_set = list(range(0, self.num_img))
         random.shuffle(id_set)
         num_poison = int(self.num_img * self.poisoning_ratio)
         backdoor_indices = id_set[:num_poison]
         clean_indices = id_set[num_poison:]
 
-        backdoor_indices.sort() # increasing order
+        backdoor_indices.sort() # Increasing order
         clean_indices.sort()
 
         print('backdoor samples num: ', len(backdoor_indices))
@@ -40,8 +53,8 @@ class poison_generator():
 
         backdoor_maker = poison_transform(
             self.img_size, 
-            self.trigger_mark, 
-            self.trigger_mask,
+            self.trigger, 
+            self.mask,
             self.target_label,
             self.alpha
         )
@@ -63,17 +76,17 @@ class poison_generator():
 
 
 
-class poison_transform():   # make poison samples
-    def __init__(self, img_size, trigger_mark, trigger_mask, target_label, alpha=1.0):
+class poison_transform():   # Make poison samples
+    def __init__(self, img_size, trigger, mask, target_label, alpha=1.0):
         self.img_size = img_size
         self.target_label = target_label
-        self.trigger_mark = trigger_mark
-        self.trigger_mask = trigger_mask
+        self.trigger = trigger
+        self.mask = mask
         self.alpha = alpha
 
     def transform(self, imgs, labels):
         imgs, labels = imgs.clone(), labels.clone()
-        imgs = imgs + self.alpha * self.trigger_mask.to(imgs.device) * (self.trigger_mark.to(imgs.device) - imgs)
+        imgs = imgs + self.alpha * self.mask.to(imgs.device) * (self.trigger.to(imgs.device) - imgs)
         labels[:] = self.target_label
 
         return imgs, labels

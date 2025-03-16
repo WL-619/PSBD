@@ -1,5 +1,5 @@
 '''
-Modified from https://github.com/vtu81/backdoor-toolbox/blob/main/utils/resnet.py
+Code modified from https://github.com/vtu81/backdoor-toolbox/blob/main/utils/resnet.py
 '''
 import torch
 import torch.nn as nn
@@ -28,8 +28,8 @@ class BasicBlock(nn.Module):
         self.drop_out = nn.Dropout(p=0.3)
 
     def forward(self, x):
-        # place dropout after convolution layer and before batch normalization layer, 
-        # based on https://github.com/nayeemrizve/ups/blob/main/models/wideresnet.py
+        # We place dropout after the convolution layer and before batch normalization layer for pilot studies
+        # Based on https://github.com/nayeemrizve/ups/blob/main/models/wideresnet.py
         out = F.relu(self.bn1(self.drop_out(self.conv1(x))))
         out = self.bn2(self.drop_out(self.conv2(out)))
         out += self.shortcut(x)

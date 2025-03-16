@@ -1,5 +1,5 @@
 '''
-Modified from https://github.com/vtu81/backdoor-toolbox/blob/main/create_clean_set.py
+Code modified from https://github.com/vtu81/backdoor-toolbox/blob/main/create_clean_set.py
 '''
 import sys
 sys.path.append("..")
@@ -31,7 +31,7 @@ def add_arguments(parser):
     return parser
 
 def prepare_dataset(args):
-    data_dir = common_config.clean_data_dir  # directory to save standard clean set
+    data_dir = common_config.clean_data_dir  # Directory to save standard clean set
     data_transform = transforms.Compose([transforms.ToTensor()])
 
     if args.dataset == 'cifar10':
@@ -58,16 +58,16 @@ def prepare_dataset(args):
     else:
         raise NotImplementedError('Dataset is not implemented')
 
-    # extra validation data: clean samples at hand for defensive purpose
+    # Extra validation data: clean samples at hand for defensive purpose
     extra_val_split_dir = os.path.join(args.dataset, 'extra_val_split', 'val_budget_rate_'+str(args.val_budget_rate))
     if not os.path.exists(extra_val_split_dir): tools.create_missing_folders(extra_val_split_dir)
 
-    test_split_dir = os.path.join(args.dataset, 'test_split')  # test samples for evaluation purpose
+    test_split_dir = os.path.join(args.dataset, 'test_split')  # Test samples for evaluation purpose
     if not os.path.exists(test_split_dir): tools.create_missing_folders(test_split_dir)
 
     if args.dataset in default_args.parser_choices['dataset']:
 
-        # randomly sample from a clean test/val set to simulate the extra clean val samples at hand
+        # Randomly sample from a clean test/val set to simulate the extra clean val samples at hand
         if(args.dataset != 'tiny'):
             num_train_imgs, num_test_imgs = supervisor.get_info_dataset(args, get_count=True)
         else:

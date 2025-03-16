@@ -9,6 +9,19 @@ import torch.nn.functional as F
 class poison_generator():
 
     def __init__(self, img_size, dataset, poisoning_ratio, cover_rate, target_label, identity_grid, noise_grid, s=0.5, k=4, grid_rescale=1):
+        """
+        Initializes the generator for poisoned samples in the wanet backdoor attack
+        
+        Args:
+            img_size: Input image size (assumed square)
+            dataset: The training dataset
+            poisoning_ratio: The ratio of poisoned samples
+            cover_rate: The ratio of cover samples that contain the trigger but retain their original labels
+            target_label: Target class label
+            identity_grid: Identity grid
+            noise_grid: Noise grid
+        """
+        
         self.img_size = img_size
         self.dataset = dataset
         self.poisoning_ratio = poisoning_ratio
@@ -16,7 +29,7 @@ class poison_generator():
 
         self.target_label = target_label
 
-        # number of images
+        # The number of images
         self.num_img = len(dataset)
 
         self.s = s
@@ -29,7 +42,7 @@ class poison_generator():
         self.grid_temps = torch.clamp(self.grid_temps, -1, 1)
 
     def generate_poisoned_training_set(self):
-        # random sampling
+        # Random sampling
         id_set = list(range(0, self.num_img))
         random.shuffle(id_set)
         num_poison = int(self.num_img * self.poisoning_ratio)
@@ -40,7 +53,7 @@ class poison_generator():
 
         clean_indices = id_set[num_poison+num_cover:]
 
-        backdoor_indices.sort() # increasing order
+        backdoor_indices.sort() # Increasing order
         cover_indices.sort()
         clean_indices.sort()
 
@@ -84,7 +97,7 @@ class poison_generator():
 
 
 
-class poison_transform():   # make poison samples
+class poison_transform():   # Make poison samples
     def __init__(self, img_size, normalizer, denormalizer, identity_grid, noise_grid, target_label, s=0.5, k=4, grid_rescale=1,):
 
         self.img_size = img_size

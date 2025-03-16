@@ -1,5 +1,5 @@
 """
-Please download https://github.com/HanxunH/CognitiveDistillation first
+Please clone the repo https://github.com/HanxunH/CognitiveDistillation first
 """
 
 from tqdm import tqdm
@@ -64,20 +64,15 @@ class CDL():
             tools.create_missing_folders(self.save_path)
         torch.save(train_results, self.filename)
         
-        # s = int(len(train_results) * 0.1)
-        # s = int(len(train_results) * 0.1)
-
-        # self.analysis.train(train_results[:s])
         self.analysis.train(val_results)
         train_scores = self.analysis.predict(train_results, t=1)
-        # assert print(f"train_scores is {train_scores}, shape {train_scores.shape}")
         return train_scores
         
 
 def cleanser(inspection_set, selcected_model, args, clean_set):
     kwargs = {'num_workers': 4, 'pin_memory': True}
 
-    # main dataset we aim to cleanse
+    # The dataset we aim to cleanse
     inspection_split_loader = torch.utils.data.DataLoader(
             inspection_set,
             batch_size=128, 
@@ -85,7 +80,7 @@ def cleanser(inspection_set, selcected_model, args, clean_set):
             **kwargs
         )
 
-    # a small clean batch for defensive purpose
+    # A small clean batch for defensive purpose
     clean_set_loader = torch.utils.data.DataLoader(
             clean_set,
             batch_size=128, 

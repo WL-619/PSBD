@@ -15,43 +15,43 @@ import matplotlib.pyplot as plt
 def add_arguments(parser):
     """
         Args:
-            dataset (str): The dataset we used
+            dataset (str): The training dataset
             
-            poison_type (str): Attack types
+            poison_type (str): Attack type
 
             poisoning_ratio (float): Proportion of backdoor data in the entire training dataset
 
             cover_rate (float): Ratio of data samples with backdoor trigger but without label modification to target class
 
-            alpha (float): Blend rate for blend or adaptive_blend attacks
+            alpha (float): Blend strength for blend or adaptive_blend attack
 
-            test_alpha (float): Blend rate for blend or adaptive_blend attacks during test stage
+            test_alpha (float): Blend strength for blend or adaptive_blend attack during test stage
 
-            trigger (str): trigger of attacks
+            trigger (str): Trigger of attacks
 
-            no_aug (bool, default=False): Whether to use data augmentation. If True, data augmentation will be applied
+            no_aug (bool, default=False): Whether to use data augmentation
 
-            no_normalize (bool, default=False): Whether to use data normalization. If True, data normalization will be applied
+            no_normalize (bool, default=False): Whether to use data normalization
 
             load_bench_data (bool, default=False): Whether to use data provided by https://github.com/SCLBD/BackdoorBench
 
-            scale (float): amplification factor for input pixel values
+            scale (float): The amplification factor for input pixel values
 
             random_seed (int, default=0): Random seed for dropout
 
             result_path (str): Path to save result files
 
-            checkpoint_save_path (str): Path to save checkpoints for loading checkpoints
+            checkpoint_save_path (str): Path to save model checkpoints
 
-            val_budget_rate (float, default=0.05): Proportion of clean extra validation data compared to the entire poisoned training set
+            val_budget_rate (float, default=0.05): Size of clean extra validation dataset compared to the entire poisoned training set
 
-            load_checkpoint_path (str): Directly specify the path of checkpoints
+            load_checkpoint_path (str): Specify the path of checkpoints directly if needed
 
-            fig_path (str): Path to save figs
+            fig_path (str): Path to save figures
 
             result_save_path (str): Path to save results
 
-            num_model (int, default=100): the number of training epochs to observe
+            num_model (int, default=100): The number of training epochs to observe
 
     """
     parser.add_argument('-dataset', type=str, required=False,
@@ -123,7 +123,7 @@ def prepare_dataset(args):
                 label_path=cover_train_labels_path,
                 transforms=data_transform
             )
-            # we do not consider cover data as backdoor data because cover data cannot trigger the backdoor attack
+            # We do not consider cover data as backdoor data because cover data cannot trigger the backdoor attack
             clean_train_set = torch.utils.data.ConcatDataset([clean_train_set, cover_train_set])
 
     else:
@@ -193,7 +193,7 @@ def get_checkpoint_path(args):
     return checkpoint_path
 
 def mc_drop_uncertainty(args, model, dataloader, mode, forward_passes=3, p=0.2):
-    # based on https://github.com/nayeemrizve/ups/blob/3ba73f3/utils/pseudo_labeling_util.py#L37
+    # Based on https://github.com/nayeemrizve/ups/blob/3ba73f3/utils/pseudo_labeling_util.py#L37
     data_transform_aug, data_transform, trigger_transform, normalizer, denormalizer = supervisor.get_transforms(args)
     model.eval()
     tools.setup_seed(args.random_seed)

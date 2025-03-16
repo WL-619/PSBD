@@ -1,5 +1,5 @@
 '''
-Modified from https://github.com/vtu81/backdoor-toolbox/blob/main/create_poisoned_set.py
+Code modified from https://github.com/vtu81/backdoor-toolbox/blob/main/create_poisoned_set.py
 '''
 import os
 import sys
@@ -17,17 +17,17 @@ from utils import supervisor, tools
 def add_arguments(parser):
     """
         Args:
-            dataset (str): The dataset we used
+            dataset (str): The training dataset
             
-            poison_type (str): Attack types
+            poison_type (str): Attack type
 
             poisoning_ratio (float): Proportion of backdoor data in the entire training dataset
 
             cover_rate (float): Ratio of data samples with backdoor trigger but without label modification to target class
 
-            alpha (float): Blend rate for blend or adaptive_blend attacks
+            alpha (float): Blend strength for blend or adaptive_blend attack
 
-            trigger (str): trigger of attacks
+            trigger (str): Trigger of attacks
 
             poison_seed (int): Random seed for generating the poisoned dataset, rather than the seed used for model training
 
@@ -121,10 +121,10 @@ def prepare_dataset(args):
         trigger = trigger_transform(trigger)
 
         trigger_mask_path = os.path.join(attack_config.triggers_dir, 'mask_%s' % trigger_name)
-        if os.path.exists(trigger_mask_path):  # if there explicitly exists a trigger mask (with the same name)
+        if os.path.exists(trigger_mask_path):  # If there explicitly exists a trigger mask (with the same name)
             trigger_mask = Image.open(trigger_mask_path).convert("RGB")
-            trigger_mask = transforms.ToTensor()(trigger_mask)[0]  # only use 1 channel
-        else:  # by default, all black pixels are masked with 0's
+            trigger_mask = transforms.ToTensor()(trigger_mask)[0]  # Only use 1 channel
+        else:  # By default, all black pixels are masked with 0's
             print('No trigger mask found! By default masking all black pixels...')
             trigger_mask = torch.logical_or(torch.logical_or(trigger[0] > 0, trigger[1] > 0), trigger[2] > 0).float()
 
@@ -155,7 +155,7 @@ def prepare_dataset(args):
         )
 
     elif args.poison_type == 'wanet':
-        # prepare grid
+        # Prepare grid
         s = 0.5
         k = 4
         grid_rescale = 1
@@ -218,15 +218,15 @@ def prepare_dataset(args):
         else:
             raise NotImplementedError('Label-Consistent Attack is not implemented for %s' % args.dataset)
 
-        # init attacker
+        # Init attacker
         from attack import lc
         poison_generator = lc.poison_generator(
             img_size=img_size, 
             dataset=train_set, 
             adv_imgs=adv_imgs,
             poisoning_ratio=args.poisoning_ratio,
-            trigger_mark = trigger, trigger_mask=trigger_mask,
-            path=poison_set_save_dir,
+            trigger_mark = trigger,
+            trigger_mask=trigger_mask,
             target_label=attack_config.target_label[args.dataset],
         )
 

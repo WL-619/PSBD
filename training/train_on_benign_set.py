@@ -22,9 +22,9 @@ def add_arguments(parser):
 
             resume_from_meta_info (bool): Resume from the meta info
 
-            no_aug (bool, default=False): Whether to use data augmentation. If True, data augmentation will be applied
+            no_aug (bool, default=False): Whether to use data augmentation
 
-            no_normalize (bool, default=False): Whether to use data normalization. If True, data normalization will be applied
+            no_normalize (bool, default=False): Whether to use data normalization
 
             log (bool, default=False): Whether to save log file
 
@@ -129,8 +129,8 @@ if __name__ == "__main__":
     arch = common_config.arch[args.dataset]
     training_setting = common_config.training_setting
 
-    # set variables in training_setting as global variables for direct usage
-    # it includes momentum, weight_decay, epochs, milestones, learning_rate and batch_size
+    # Set variables in training_setting as global variables for direct usage
+    # It includes momentum, weight_decay, epochs, milestones, learning_rate and batch_size
     for key, value in training_setting.items():
         globals()[key] = value
 
@@ -191,15 +191,15 @@ if __name__ == "__main__":
     scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=milestones)
 
     training_loss = []
-    for epoch in range(1, epochs+1):  # train backdoored base model
+    for epoch in range(1, epochs+1):  # Train backdoored base model
         start_time = time.perf_counter()
 
-        # skip to the checkpointed epoch
+        # Skip to the checkpointed epoch
         if epoch <= args.resume:
             scheduler.step()
             continue
 
-        # train
+        # Model training
         model.train()
         preds = []
         labels = []
@@ -216,7 +216,7 @@ if __name__ == "__main__":
         print('Benign Training> Train Epoch: {} \tLoss: {:.6f}, lr: {:.6f}, Time: {:.2f}s'.format(epoch, loss.item(), optimizer.param_groups[0]['lr'], elapsed_time))
         scheduler.step()
 
-        # test
+        # Test
         ca, asr, loss = tools.test(
             model=model, 
             test_loader=test_set_loader, 
@@ -240,7 +240,7 @@ if __name__ == "__main__":
     torch.save(training_loss, os.path.join(checkpoint_save_path, "training_loss"))
     torch.save(meta_info, os.path.join(checkpoint_save_path, "meta_info"))
 
-    # log information
+    # The log information
     if args.log:
         log_path = os.path.join('../logs', '%s_random_seed=%d' % (args.dataset, args.random_seed))
         if not os.path.exists(log_path): tools.create_missing_folders(log_path)

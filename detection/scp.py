@@ -31,8 +31,8 @@ class ScaleUp():
         self.model.eval()
         total_spc = []
         for idx, (imgs, labels) in enumerate(tqdm(inspection_split_loader)):
-            imgs = imgs.cuda()  # batch * channels * hight * width
-            labels = labels.cuda()  # batch
+            imgs = imgs.cuda()
+            labels = labels.cuda()
             
             scaled_imgs = []
             scaled_labels = []
@@ -42,8 +42,8 @@ class ScaleUp():
                 scale_label = torch.argmax(self.model(scale_img), dim=1)
                 scaled_labels.append(scale_label)
             
-            pred = torch.argmax(self.model(imgs), dim=1) # model prediction
-            # compute the SPC Value
+            pred = torch.argmax(self.model(imgs), dim=1) # Model prediction
+            # Compute the SPC Value
             spc = torch.zeros(labels.shape).cuda()
             for scale_label in scaled_labels:
                 spc += scale_label == pred
@@ -67,13 +67,13 @@ class ScaleUp():
             poison_source_mask = []
             poison_attack_success_mask = []
             for batch_idx, (data, target) in enumerate(tqdm(self.test_loader)):
-                # on poison data
+                # On poison data
                 data, target = data.cuda(), target.cuda()
                 
                 
                 clean_output = self.model(data)
                 clean_pred = clean_output.argmax(dim=1)
-                mask = torch.eq(clean_pred, target) # only look at those samples that successfully attack the DNN
+                mask = torch.eq(clean_pred, target) # Only look at those samples that successfully attack the DNN
                 clean_pred_correct_mask.append(mask)
                 
                 
@@ -82,13 +82,13 @@ class ScaleUp():
                 if args.poison_type == 'TaCT':
                     mask = torch.eq(target, config.source_class)
                 else:
-                    # remove backdoor data whose original class == target class
+                    # Remove backdoor data whose original class == target class
                     mask = torch.not_equal(target, poison_target)
                 poison_source_mask.append(mask.clone())
                 
                 poison_output = self.model(poison_data)
                 poison_pred = poison_output.argmax(dim=1)
-                mask = torch.logical_and(torch.eq(poison_pred, poison_target), mask) # only look at those samples that successfully attack the DNN
+                mask = torch.logical_and(torch.eq(poison_pred, poison_target), mask) # Only look at those samples that successfully attack the DNN
                 poison_attack_success_mask.append(mask)
 
             clean_pred_correct_mask = torch.cat(clean_pred_correct_mask, dim=0)
@@ -113,8 +113,8 @@ class ScaleUp():
         total_spc = []
         self.model.eval()
         for idx, (clean_img, labels) in enumerate(clean_set_loader):
-            clean_img = clean_img.cuda()  # batch * channels * hight * width
-            labels = labels.cuda()  # batch
+            clean_img = clean_img.cuda()
+            labels = labels.cuda()
             scaled_imgs = []
             scaled_labels = []
             for scale in self.scale_set:
@@ -123,7 +123,7 @@ class ScaleUp():
                 scale_label = torch.argmax(self.model(scale_img), dim=1)
                 scaled_labels.append(scale_label)
 
-            # compute the SPC Value
+            # Compute the SPC Value
             spc = torch.zeros(labels.shape).cuda()
             for scale_label in scaled_labels:
                 spc += scale_label == labels
@@ -136,7 +136,7 @@ class ScaleUp():
 def cleanser(inspection_set, selcected_model, args, clean_set, inspect_correct_predition_only=False):
     kwargs = {'num_workers': 4, 'pin_memory': True}
 
-    # main dataset we aim to cleanse
+    # The dataset we aim to cleanse
     inspection_split_loader = torch.utils.data.DataLoader(
             inspection_set,
             batch_size=128, 
@@ -144,7 +144,7 @@ def cleanser(inspection_set, selcected_model, args, clean_set, inspect_correct_p
             **kwargs
         )
 
-    # a small clean batch for defensive purpose
+    # A small clean batch for defensive purpose
     clean_set_loader = torch.utils.data.DataLoader(
             clean_set,
             batch_size=128, 

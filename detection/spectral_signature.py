@@ -38,7 +38,7 @@ def cleanser(inspection_set, model, num_classes, args):
         batch_size=128, shuffle=False, **kwargs)
 
     # Spectral Signature requires an expected poison ratio (we allow the oracle here as a baseline)
-    num_poisons_expected = args.poisoning_ratio * len(inspection_set) * 1.5 # allow removing additional 50% (following the original paper)
+    num_poisons_expected = args.poisoning_ratio * len(inspection_set) * 1.5 # Allow removing additional 50% (following the original paper)
 
     feats, class_indices = get_features(inspection_split_loader, model, num_classes)
 
@@ -56,13 +56,13 @@ def cleanser(inspection_set, model, num_classes, args):
             temp_feats = temp_feats - mean_feat
             _, _, V = torch.svd(temp_feats, compute_uv=True, some=False)
 
-            vec = V[:, 0]  # the top right singular vector is the first column of V
+            vec = V[:, 0]  # The top right singular vector is the first column of V
             vals = []
             for j in range(temp_feats.shape[0]):
                 vals.append(torch.dot(temp_feats[j], vec).pow(2))
 
             k = min(int(num_poisons_expected), len(vals) // 2)
-            # default assumption : at least a half of samples in each class is clean
+            # Default assumption : at least a half of samples in each class is clean
 
             _, indices = torch.topk(torch.tensor(vals), k)
             for temp_index in indices:

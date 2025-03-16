@@ -1,5 +1,5 @@
 '''
-Modified from https://github.com/vtu81/backdoor-toolbox/blob/main/utils/tools.py
+Code modified from https://github.com/vtu81/backdoor-toolbox/blob/main/utils/tools.py
 '''
 import torch, torchvision
 from torch import nn
@@ -26,11 +26,11 @@ class IMG_Dataset(Dataset):
         """
         self.dir = data_dir
         self.img_set = None
-        if 'data' not in self.dir: # if new version
+        if 'data' not in self.dir: # If new version
             self.img_set = torch.load(data_dir)
-        self.gt = torch.load(label_path)    # ground truth, i.e. data label
+        self.gt = torch.load(label_path)    # Ground truth label, i.e. data label
         self.transforms = transforms
-        if 'data' not in self.dir: # if new version, remove ToTensor() from the transform list
+        if 'data' not in self.dir: # If new version, remove ToTensor() from the transform list
             self.transforms = []
             for t in transforms.transforms:
                 if not isinstance(t, torchvision.transforms.ToTensor):
@@ -51,9 +51,9 @@ class IMG_Dataset(Dataset):
     def __getitem__(self, idx):
         idx = int(idx)
         
-        if self.img_set is not None: # if new version
+        if self.img_set is not None: # If new version
             img = self.img_set[idx]
-        else: # if old version
+        else: # If old version
             img = Image.open(os.path.join(self.dir, '%d.png' % idx))
         
         if self.transforms is not None:
@@ -72,7 +72,7 @@ class IMG_Dataset(Dataset):
         return img, label
 
 
-# test CA and ASR
+# Test CA and ASR
 def test(model, test_loader, args, poison_test = False, poison_transform=None, return_loss=False, num_classes=10, enable_drop=False, drop_p=0):
     model.eval()
     if enable_drop:
@@ -115,7 +115,7 @@ def test(model, test_loader, args, poison_test = False, poison_transform=None, r
                 for bid in range(this_batch_size):
                     if clean_target[bid]!=target_label:
                         num_non_target_label+=1
-                        if poison_pred[bid] == target_label:    # attack success
+                        if poison_pred[bid] == target_label:    # Attack success
                             poison_correct+=1
     
     print('Clean ACC: {}/{} = {:.6f}, Loss: {}'.format(
@@ -136,7 +136,7 @@ def test(model, test_loader, args, poison_test = False, poison_transform=None, r
 def setup_seed(seed):
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)  # if you are using multi-GPU.
+    torch.cuda.manual_seed_all(seed)  # If you are using multi-GPU.
     np.random.seed(seed)  # Numpy module.
     random.seed(seed)  # Python random module.
     # torch.backends.cudnn.enabled = False

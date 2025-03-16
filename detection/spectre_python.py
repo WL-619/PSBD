@@ -50,7 +50,7 @@ def QUEscore(temp_feats, n_dim):
 
 def SPECTRE(U, temp_feats, n_dim, budget, oracle_clean_feats=None):
 
-    projector = U[:, :n_dim].T # top left singular vectors
+    projector = U[:, :n_dim].T # Top left singular vectors
     temp_feats = torch.matmul(projector, temp_feats)
 
     if oracle_clean_feats is None:
@@ -66,20 +66,20 @@ def SPECTRE(U, temp_feats, n_dim, budget, oracle_clean_feats=None):
 
     temp_feats = (temp_feats.T - clean_mean).T
 
-    # whiten the data
+    # Whiten the data
     L, V = torch.linalg.eig(clean_covariance)
     L, V = L.real, V.real
     L = (torch.diag(L)**(1/2)+0.001).inverse()
     normalizer = torch.matmul(V, torch.matmul( L, V.T ) )
     temp_feats = torch.matmul(normalizer, temp_feats)
 
-    # compute QUEscore
+    # Compute QUEscore
     taus = QUEscore(temp_feats, n_dim)
 
     sorted_indices = np.argsort(taus)
     n_samples = len(sorted_indices)
 
-    budget = min(budget, n_samples//2) # default assumption : at least a half of samples in each class is clean
+    budget = min(budget, n_samples//2) # Default assumption : at least a half of samples in each class is clean
 
     suspicious = sorted_indices[-budget:]
     left = sorted_indices[:n_samples-budget]
@@ -116,7 +116,7 @@ def cleanser(inspection_set, model, num_classes, args, oracle_clean_set=None):
     suspicious_indices = []
     # Spectral Signature requires an expected poison ratio (we allow the oracle here as a baseline)
     budget = int(args.poisoning_ratio * len(inspection_set) * 1.5)
-    # allow removing additional 50% (following the original paper)
+    # Allow removing additional 50% (following the original paper)
 
     max_dim = 2 # 64
     class_taus = []
@@ -125,7 +125,7 @@ def cleanser(inspection_set, model, num_classes, args, oracle_clean_set=None):
 
         if len(class_indices[i]) > 1:
 
-            # feats for class i in poisoned set
+            # Feats for class i in poisoned set
             temp_feats = np.array([feats[temp_idx] for temp_idx in class_indices[i]])
             temp_feats = torch.FloatTensor(temp_feats).cuda()
 
@@ -136,20 +136,20 @@ def cleanser(inspection_set, model, num_classes, args, oracle_clean_set=None):
                 temp_clean_feats = temp_clean_feats - temp_feats.mean(dim=0)
                 temp_clean_feats = temp_clean_feats.T
 
-            temp_feats = temp_feats - temp_feats.mean(dim=0) # centered data
-            temp_feats = temp_feats.T # feats arranged in column
+            temp_feats = temp_feats - temp_feats.mean(dim=0) # Centered data
+            temp_feats = temp_feats.T # Feats arranged in column
 
             U, _, _ = torch.svd(temp_feats)
             U = U[:, :max_dim]
 
-            # full projection
+            # Full projection
             projected_feats = torch.matmul(U.T, temp_feats)
 
             max_tau = -999999
             best_n_dim = -1
             best_to_be_removed = None
 
-            for n_dim in range(2, max_dim+1): # enumarate all possible "reudced dimensions" and select the best
+            for n_dim in range(2, max_dim+1): # Enumarate all possible "reudced dimensions" and select the best
 
                 S_removed, S_left = SPECTRE(U, temp_feats, n_dim, budget, temp_clean_feats)
 

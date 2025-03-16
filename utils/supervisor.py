@@ -1,5 +1,5 @@
 '''
-Modified from https://github.com/vtu81/backdoor-toolbox/utils/supervisor.py
+Code modified from https://github.com/vtu81/backdoor-toolbox/utils/supervisor.py
 '''
 import torch
 import os
@@ -241,7 +241,7 @@ def get_poison_transform(poison_type, dataset_name, target_label, trigger_transf
                 transforms.ToTensor()
             ])
 
-        # trigger mask transform; remove `Normalize`!
+        # Trigger mask transform; remove `Normalize`!
         trigger_mask_transform_list = []
         for t in trigger_transform.transforms:
             if "Normalize" not in t.__class__.__name__:
@@ -255,10 +255,10 @@ def get_poison_transform(poison_type, dataset_name, target_label, trigger_transf
 
             trigger_mask_path = os.path.join(attack_config.triggers_dir, 'mask_%s' % trigger_name)
 
-            if os.path.exists(trigger_mask_path):  # if there explicitly exists a trigger mask (with the same name)
+            if os.path.exists(trigger_mask_path):  # If there explicitly exists a trigger mask (with the same name)
                 trigger_mask = Image.open(trigger_mask_path).convert("RGB")
-                trigger_mask = trigger_mask_transform(trigger_mask)[0]  # only use 1 channel
-            else:  # by default, all black pixels are masked with 0's
+                trigger_mask = trigger_mask_transform(trigger_mask)[0]  # Only use 1 channel
+            else:  # By default, all black pixels are masked with 0's
                 trigger_map = trigger_mask_transform(trigger)
                 trigger_mask = torch.logical_or(torch.logical_or(trigger_map[0] > 0, trigger_map[1] > 0),
                                                 trigger_map[2] > 0).float()

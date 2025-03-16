@@ -17,7 +17,7 @@ def add_arguments(parser):
 
             adv_data_path (str): Path of lc data on the tiny imagenet
 
-            alpha (float): Blend rate for blend or adaptive_blend attacks
+            alpha (float): Blend strength for blend or adaptive_blend attack
 
             poison_seed (int): Random seed for generating the poisoned dataset, rather than the seed used for model training
     """
@@ -84,7 +84,7 @@ def prepare_dataset(args):
     backdoor_indices = id_set[:num_poison]
     clean_indices = id_set[num_poison:]
 
-    backdoor_indices.sort() # increasing order
+    backdoor_indices.sort() # Increasing order
     clean_indices.sort()
 
     print('number of backdoor samples: ', len(backdoor_indices))

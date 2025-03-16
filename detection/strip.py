@@ -26,7 +26,7 @@ class STRIP():
 
     def cleanse(self):
 
-        # choose a decision boundary with the test set
+        # Choose a decision boundary with the test set
         clean_entropy = []
         clean_set_loader = torch.utils.data.DataLoader(self.clean_set, batch_size=128, shuffle=False)
         for _input, _label in tqdm(clean_set_loader):
@@ -41,7 +41,7 @@ class STRIP():
         threshold_low = float(clean_entropy[int(self.defense_fpr * len(clean_entropy))])
         threshold_high = np.inf
 
-        # now cleanse the inspection set with the chosen boundary
+        # Now cleanse the inspection set with the chosen boundary
         inspection_set_loader = torch.utils.data.DataLoader(self.inspection_set, batch_size=128, shuffle=False)
         all_entropy = []
         for _input, _label in tqdm(inspection_set_loader):

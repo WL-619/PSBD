@@ -1,5 +1,5 @@
 '''
-Modified from https://github.com/vtu81/backdoor-toolbox/blob/main/utils/vgg.py
+Code modified from https://github.com/vtu81/backdoor-toolbox/blob/main/utils/vgg.py
 '''
 import math
 
@@ -40,7 +40,7 @@ class VGG(nn.Module):
 
 
     def forward(self, x, return_hidden=False):
-        # the original dropout layer in the VGG architecture is sufficient
+        # The original dropout layer in the VGG architecture is sufficient
         for m in self.features.children():
             if isinstance(m, nn.ReLU):
                 x = self.drop(x)

@@ -20,23 +20,23 @@ from models import resnet_drop
 def add_arguments(parser):
     """
         Args:
-            dataset (str): The dataset we used
+            dataset (str): The training dataset
             
-            poison_type (str): Attack types
+            poison_type (str): Attack type
 
             poisoning_ratio (float): Proportion of backdoor data in the entire training dataset
 
             cover_rate (float): Ratio of data samples with backdoor trigger but without label modification to target class
 
-            alpha (float): Blend rate for blend or adaptive_blend attacks
+            alpha (float): Blend strength for blend or adaptive_blend attacks
 
-            test_alpha (float): Blend rate for blend or adaptive_blend attacks during test stage
+            test_alpha (float): Blend strength for blend or adaptive_blend attacks during test stage
 
-            trigger (str): trigger of attacks
+            trigger (str): Trigger of attacks
 
-            no_aug (bool, default=False): Whether to use data augmentation. If True, data augmentation will be applied
+            no_aug (bool, default=False): Whether to use data augmentation
 
-            no_normalize (bool, default=False): Whether to use data normalization. If True, data normalization will be applied
+            no_normalize (bool, default=False): Whether to use data normalization
 
             load_bench_data (bool, default=False): Whether to use data provided by https://github.com/SCLBD/BackdoorBench
 
@@ -46,15 +46,15 @@ def add_arguments(parser):
 
             result_path (str): Path to save result files
 
-            checkpoint_save_path (str): Path to save checkpoints for loading checkpoints
+            checkpoint_save_path (str): Path to save model checkpoints
 
-            val_budget_rate (float, default=0.05): Proportion of clean extra validation data compared to the entire poisoned training set
+            val_budget_rate (float, default=0.05): Size of clean extra validation data compared to the entire poisoned training set
 
             select_model (int, default=95): Model used for backdoor data detection
 
-            load_checkpoint_path (str): Directly specify the path of checkpoints
+            load_checkpoint_path (str): Specify the path of checkpoints directly if needed
 
-            fig_path (str): Path to save figs
+            fig_path (str): Path to save figures
 
     """
 
@@ -102,7 +102,7 @@ def get_dataloader(args):
     training_setting = common_config.training_setting
     data_transform_aug, data_transform, trigger_transform, normalizer, denormalizer = supervisor.get_transforms(args)
 
-    # clean extra validation data
+    # The clean extra validation data
     extra_val_path = os.path.join(common_config.extra_data_dir, args.dataset, 'extra_val_split', 'val_budget_rate_'+str(args.val_budget_rate), 'extra_val_data.pt')
     extra_val_set = torch.load(extra_val_path)
     logger.info("Get extra val loader...")
@@ -122,14 +122,14 @@ def get_dataloader(args):
         backdoor_train_imgs_path = os.path.join(poison_set_dir, 'backdoor_imgs.pt')
         backdoor_train_labels_path = os.path.join(poison_set_dir, 'backdoor_labels.pt')
         
-        # clean training data
+        # The clean training data
         clean_train_set = tools.IMG_Dataset(
             data_dir=clean_train_imgs_path,
             label_path=clean_train_labels_path,
             transforms=data_transform
         )
         
-        # backdoor training data
+        # The backdoor training data
         backdoor_train_set = tools.IMG_Dataset(
             data_dir=backdoor_train_imgs_path,
             label_path=backdoor_train_labels_path,
@@ -140,14 +140,14 @@ def get_dataloader(args):
             cover_train_imgs_path = os.path.join(poison_set_dir, 'cover_imgs.pt')
             cover_train_labels_path = os.path.join(poison_set_dir, 'cover_labels.pt')
 
-            # cover training data
+            # The cover training data
             cover_train_set = tools.IMG_Dataset(
                 data_dir=cover_train_imgs_path,
                 label_path=cover_train_labels_path,
                 transforms=data_transform
             )
     else:
-        # if using bench data, manual transformation is required
+        # If using bench data, manual transformation is required
         clean_train_set = torch.load(os.path.join(poison_set_dir, 'clean_train_data.pt'))
         backdoor_train_set = torch.load(os.path.join(poison_set_dir, 'backdoor_train_data.pt'))
         transform = data_transform
@@ -207,8 +207,8 @@ def get_dataloader(args):
             drop_last=False,
     )
 
-    # we do not consider cover data as backdoor data because cover data cannot trigger the backdoor attack
-    # we treat backdoor data as positive samples
+    # We do not consider cover data as backdoor data because cover data cannot trigger the backdoor attack
+    # We treat backdoor data as positive samples
     backdoor_indicator = torch.zeros(len(poisoned_train_set))
     backdoor_indicator[-len(backdoor_train_set):] = 1
 
@@ -257,7 +257,7 @@ def compute_psu(args, model, dataloader, mode, forward_passes=3, drop_p=0.8, ret
                 inputs = inputs.cuda()
                 target = target.cuda()
 
-                # compute prediction confidences before turning on dropout
+                # Compute prediction confidences before turning on dropout
                 model.eval()
                 primitive_prob = F.softmax(model(inputs), dim=1)
                 primitive_label = torch.argmax(primitive_prob, dim=1)                
@@ -268,7 +268,7 @@ def compute_psu(args, model, dataloader, mode, forward_passes=3, drop_p=0.8, ret
                         m.train()
                         m.p = drop_p
 
-                # compute prediction confidences after turning on dropout
+                # Compute prediction confidences after turning on dropout
                 drop_prob = []
                 for _ in range(forward_passes):
                     outputs = model(inputs)
@@ -282,7 +282,7 @@ def compute_psu(args, model, dataloader, mode, forward_passes=3, drop_p=0.8, ret
 
                 diff = primitive_prob - mean_prob
 
-                # psu is the difference that only corresponds to the primitive label
+                # The psu value is the difference that only corresponds to the primitive label
                 psu_per_batch.append(diff.gather(1, primitive_label.view(-1,1)).squeeze(1))
                 psu_per_batch = torch.stack(psu_per_batch)
                 psu_per_batch = psu_per_batch.squeeze(0)
@@ -294,7 +294,7 @@ def compute_psu(args, model, dataloader, mode, forward_passes=3, drop_p=0.8, ret
         
         ps = torch.cat(ps)
 
-        # proportion of times ps occurs out of all inference occurrences
+        # The proportion of times ps occurs out of all inference occurrences
         shift_ratio = len(ps)/(len(dataloader.dataset)*forward_passes)
         logger.info(f"\nshift ratio = {shift_ratio*100}%\n")
 
@@ -304,7 +304,7 @@ def compute_psu(args, model, dataloader, mode, forward_passes=3, drop_p=0.8, ret
         return psu
 
 def get_psu(args, model, clean_loader, bd_loader, val_loader, forward_passes=3, drop_p=0.8):    
-    # compute psu of clean training data, backdoor training data, and clean extra validation data
+    # Compute psu of clean training data, backdoor training data, and clean extra validation data
     clean_psu = torch.empty(0).cuda()
     backdoor_psu = torch.empty(0).cuda()
     val_psu = torch.empty(0).cuda()
@@ -328,7 +328,7 @@ def get_psu(args, model, clean_loader, bd_loader, val_loader, forward_passes=3, 
     return clean_psu, backdoor_psu, val_psu
 
 def select_dropout_rate(args, selcected_model, poisoned_train_set_loader, clean_loader, backdoor_loader, extra_val_set_loader, draw_shift_ratio=False):
-    # dropout rate chosen for psbd
+    # The dropout rate chosen for psbd
     p_index = [i / 10.0 for i in range(1, 10)]
     total_ratio = []
     clean_ratio = []
@@ -391,10 +391,10 @@ def ps_intensity_fig(num_classes, clean_train_ps, bd_train_ps, extra_clean_ps):
     else:
         x_tick = []
 
-    # display only the top k results with the highest ps intensity on the tiny imageNet dataset
+    # Display only the top k results with the highest ps intensity on the tiny imageNet dataset
     k = 3
 
-    # ps intensity of clean training data
+    # The ps intensity of clean training data
     pre, counts = torch.unique(clean_train_ps, return_counts=True)
     if num_classes > 10:
         if len(counts) < k:
@@ -415,7 +415,7 @@ def ps_intensity_fig(num_classes, clean_train_ps, bd_train_ps, extra_clean_ps):
         x_tick.append(pre[max_index])
     
 
-    # ps intensity of backdoor training data
+    # The ps intensity of backdoor training data
     pre, counts = torch.unique(bd_train_ps, return_counts=True)
 
     if num_classes > 10:
@@ -438,7 +438,7 @@ def ps_intensity_fig(num_classes, clean_train_ps, bd_train_ps, extra_clean_ps):
         x_tick.append(pre[max_index])
 
 
-    # ps intensity of clean extra validation data
+    # The ps intensity of clean extra validation data
     pre, counts = torch.unique(extra_clean_ps, return_counts=True)
 
     if num_classes > 10:
@@ -478,7 +478,7 @@ def ps_intensity_fig(num_classes, clean_train_ps, bd_train_ps, extra_clean_ps):
     return
 
 def smooth(x, y):
-    # function to generate interpolation for smooth curves
+    # The function to generate interpolation for smooth curves
     x = np.array(x)
     y = np.array(y)
     t = np.linspace(min(x), max(x), 300)
@@ -487,7 +487,7 @@ def smooth(x, y):
     return t, smooth_y
 
 def shift_ratio_fig(drop_p, total_ratio, clean_ratio, bd_ratio, val_ratio, selected_p):
-    # shift ratio curve
+    # The shift ratio curve
     figure, ax = plt.subplots(1, 1, figsize=(13, 7))
     patch = ax.patch
     patch.set_color("#EBEBEB")
@@ -578,6 +578,7 @@ if __name__ == "__main__":
     print("TPR: {:.3f}".format(tpr))
     print("FPR: {:.3f}".format(fpr))
 
+    # Draw the analysis figures
     # clean_psu, backdoor_psu, val_psu = get_psu(
         #     args,
         #     selcected_model, 
@@ -597,7 +598,7 @@ if __name__ == "__main__":
     # v_ps, _ = compute_psu(args, selcected_model, extra_val_set_loader, 'val', forward_passes=3, drop_p=selected_p, return_shift=True)
     # ps_intensity_fig(num_classes, c_ps.cpu(), b_ps.cpu(), v_ps.cpu())
     
-    # log information
+    # The log information
     if args.log:
         exe_end_time = datetime.datetime.now()
 

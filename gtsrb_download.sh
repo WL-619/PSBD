@@ -1,5 +1,5 @@
 # https://github.com/SCLBD/BackdoorBench/blob/main/sh/gtsrb_download.sh
-# please download the following files and put them in ./clean_dataset folder
+# Please download the following files and put them in ./clean_dataset folder
 # ! Do not use the torch.datasets.GTSRB
 wget -P ./clean_dataset https://sid.erda.dk/public/archives/daaeac0d7ce1152aea9b61d9f1e19370/GTSRB_Final_Training_Images.zip --no-check-certificate
 wget -P ./clean_dataset https://sid.erda.dk/public/archives/daaeac0d7ce1152aea9b61d9f1e19370/GTSRB_Final_Test_Images.zip --no-check-certificate

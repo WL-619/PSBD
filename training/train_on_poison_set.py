@@ -18,25 +18,25 @@ def add_arguments(parser):
         Args:
             dataset (str): The dataset we used
             
-            poison_type (str): Attack types
+            poison_type (str): Attack type
 
             poisoning_ratio (float): Proportion of backdoor data in the entire training dataset
 
             cover_rate (float): Ratio of data samples with backdoor trigger but without label modification to target class
 
-            alpha (float): Blend rate for blend or adaptive_blend attacks
+            alpha (float): Blend strength for blend or adaptive_blend attack
 
-            test_alpha (float): Blend rate for blend or adaptive_blend attacks during test stage
+            test_alpha (float): Blend strength for blend or adaptive_blend attack during test stage
 
-            resume (int):
+            resume (int): Resume from the checkpoint
 
-            resume_from_meta_info (bool):
+            resume_from_meta_info (bool): Resume from the meta info
 
-            trigger (str): trigger of attacks
+            trigger (str): Trigger of attacks
 
-            no_aug (bool, default=False): Whether to use data augmentation. If True, data augmentation will be applied
+            no_aug (bool, default=False): Whether to use data augmentation
 
-            no_normalize (bool, default=False): Whether to use data normalization. If True, data normalization will be applied
+            no_normalize (bool, default=False): Whether to use data normalization
 
             load_bench_data (bool, default=False): Whether to use data provided by https://github.com/SCLBD/BackdoorBench
 
@@ -244,8 +244,8 @@ if __name__ == "__main__":
     arch = common_config.arch[args.dataset]
     training_setting = common_config.training_setting
 
-    # set variables in training_setting as global variables for direct usage
-    # it includes momentum, weight_decay, epochs, milestones, learning_rate and batch_size
+    # Set variables in training_setting as global variables for direct usage
+    # It includes momentum, weight_decay, epochs, milestones, learning_rate and batch_size
     for key, value in training_setting.items():
         globals()[key] = value
     
@@ -328,15 +328,15 @@ if __name__ == "__main__":
 
     exe_start_time = datetime.datetime.now()
     training_loss = []
-    for epoch in range(1, epochs+1):  # train backdoored base model
+    for epoch in range(1, epochs+1):  # Train backdoored base model
         start_time = time.perf_counter()
 
-        # skip to the checkpointed epoch
+        # Skip to the checkpointed epoch
         if epoch <= args.resume:
             scheduler.step()
             continue
 
-        # train
+        # Model training
         model.train()
         preds = []
         labels = []
@@ -353,7 +353,7 @@ if __name__ == "__main__":
         print('<Backdoor Training> Train Epoch: {} \tLoss: {:.6f}, lr: {:.6f}, Time: {:.2f}s'.format(epoch, loss.item(), optimizer.param_groups[0]['lr'], elapsed_time))
         scheduler.step()
 
-        # test
+        # Test
         if backdoor_test_set is None:
             ca, asr, loss = tools.test(
                 model=model, 
@@ -396,7 +396,7 @@ if __name__ == "__main__":
     torch.save(training_loss, os.path.join(checkpoint_save_path, "training_loss"))
     torch.save(meta_info, os.path.join(checkpoint_save_path, "meta_info"))
 
-    # log information
+    # The log information
     if args.log:
         log_path = os.path.join('../logs', '%s_random_seed=%d' % (args.dataset, args.random_seed))
         if not os.path.exists(log_path): tools.create_missing_folders(log_path)

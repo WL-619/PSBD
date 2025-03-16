@@ -12,9 +12,9 @@ import argparse
 def add_arguments(parser):
     """
         Args:
-            dataset (str): The dataset we used
+            dataset (str): The training dataset
             
-            poison_type (str): Attack types
+            poison_type (str): Attack type
 
             data_path (str): Path of bench data
 
