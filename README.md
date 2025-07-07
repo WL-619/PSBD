@@ -133,11 +133,12 @@ python train_on_benign_set.py -dataset tiny -no_normalize
 ## 📄 Citation
 If you find our work to be useful for your research, please cite
 ```
-@article{li2024psbd,
-  title={PSBD: Prediction Shift Uncertainty Unlocks Backdoor Detection},
+@inproceedings{li2025psbd,
+  title={PSBD: Prediction shift uncertainty unlocks backdoor detection},
   author={Li, Wei and Chen, Pin-Yu and Liu, Sijia and Wang, Ren},
-  journal={arXiv preprint arXiv:2406.05826},
-  year={2024}
+  booktitle={Proceedings of the Computer Vision and Pattern Recognition Conference},
+  pages={10255--10264},
+  year={2025}
 }
 ```
 
